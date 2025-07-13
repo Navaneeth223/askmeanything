@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal FAQ Chatbot</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    // Simulated bio/portfolio data (fine-tuned prompt replacement)
+    const bioData = {
+      name: "John Doe",
+      occupation: "Software Engineer",
+      skills: ["JavaScript", "React", "Node.js", "Python"],
+      projects: [
+        { name: "Project A", description: "A web app for task management built with React and Node.js." },
+        { name: "Project B", description: "A machine learning model for image classification using Python." }
+      ],
+      interests: ["AI development", "Open-source contributions", "Hiking"],
+      bio: "I'm a passionate software engineer with 5 years of experience building web applications and exploring AI technologies. I love contributing to open-source projects and spending time outdoors."
+    };
+
+    // Simulated AI response function
+    function getAIResponse(question) {
+      question = question.toLowerCase();
+      if (question.includes("who are you") || question.includes("about you")) {
+        return bioData.bio;
+      } else if (question.includes("skills")) {
+        return `My skills include: ${bioData.skills.join(", ")}.`;
+      } else if (question.includes("projects")) {
+        return `I've worked on: ${bioData.projects.map(p => `${p.name} - ${p.description}`).join("; ")}.`;
+      } else if (question.includes("interests")) {
+        return `I'm interested in: ${bioData.interests.join(", ")}.`;
+      } else {
+        return "That's an interesting question! I can tell you about my skills, projects, or interests. Try asking about one of those!";
+      }
+    }
+
+    // Chatbot Component
+    function Chatbot() {
+      const [messages, setMessages] = useState([]);
+      const [input, setInput] = useState("");
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!input.trim()) return;
+
+        // Add user message
+        setMessages([...messages, { sender: "user", text: input }]);
+
+        // Get AI response
+        const aiResponse = getAIResponse(input);
+        setMessages([...messages, { sender: "user", text: input }, { sender: "ai", text: aiResponse }]);
+
+        // Clear input
+        setInput("");
+      };
+
+      return (
+        <div className="flex flex-col h-screen bg-gray-100">
+          <header className="bg-blue-600 text-white p-4 text-center">
+            <h1 className="text-2xl font-bold">{bioData.name}'s FAQ Chatbot</h1>
+            <p>Ask me about my skills, projects, or interests!</p>
+          </header>
+          <div className="flex-1 overflow-y-auto p-4">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`mb-4 p-2 rounded-lg max-w-md ${
+                  msg.sender === "user"
+                    ? "bg-blue-200 ml-auto text-right"
+                    : "bg-white mr-auto"
+                }`}
+              >
+                {msg.text}
+              </div>
+            ))}
+          </div>
+          <div className="p-4 bg-white border-t">
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask a question..."
+                className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+              <button
+                type="submit"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // Render the app
+    ReactDOM.render(<Chatbot />, document.getElementById("root"));
+  </script>
+</body>
+</html>
